@@ -24,6 +24,7 @@ optional arguments:
 
   Usage exampel below:
   ```
-./sr_parser.py --caseid XXX-WWW-12345 --url 'https://softnas.s3.amazonaws.com/reports/jdoe@www.com/azure_10.100.100.145_Support_Ticket=XXX-WWW-12345/20200405072301/support-report.tgz?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJFVR3H5D5NCBP5RQ/20200406/us-east-1/s3/aws4_request&X-Amz-Date=20200406T155537Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=18ad4e2a81894673b4f970781d6d5611e01b1aa1e987ba7a83dd499df3014c89'
+./sr_parser.py --caseid XXX-WWW-12345\
+ --url 'https://softnas.s3.amazonaws.com/reports/jdoe@www.com/azure_10.100.100.145_Support_Ticket=XXX-WWW-12345/20200405072301/support-report.tgz?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJFVR3H5D5NCBP5RQ/20200406/us-east-1/s3/aws4_request&X-Amz-Date=20200406T155537Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=18ad4e2a81894673b4f970781d6d5611e01b1aa1e987ba7a83dd499df3014c89'
   ```
 
