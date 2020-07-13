@@ -81,9 +81,23 @@ else:
     print "Renaming %s to %s \n" % (local_path, new_path)
     os.rename(local_path, new_path)
 
+# Change into the new working directory
 os.chdir(new_path)
 
-# Get dir list
+# Get the software version
+ver_file = 'var/www/softnas/version'
+if os.path.exists(ver_file):
+    with open(ver_file, 'r') as version_log:
+        version = version_log.readlines()
+    version_log.close()
+    for ver in version:
+        print "SoftNAS version is %s" % (ver)
+else:
+    ver_result = "No softnas version file found"
+    print "Error : %s" % ver_result
+    error_list.append(ver_result)
+
+# Get dir list from the support report
 dirs = glob.glob("*")
 
 # Get the working dirs based on regex
@@ -140,7 +154,7 @@ with open('./df-h', 'r') as file:
     lv_flag = "vg_softnas-lv_root"
     for line in file.readlines()[1:2]:
         if lv_flag in line:
-            print "This is VMWARE lvm\n"
+            print "This is VMWARE lvm"
             file.close()
             with open('./df-h', 'r') as file:
                 for line in file.readlines()[2:3]:
@@ -150,7 +164,7 @@ with open('./df-h', 'r') as file:
                     file.close()
 
             if usage > 80:
-                result = "%s usage is %d %%; over the 85 %% threshold\n" % (mount,usage)
+                result = "%s usage is %d %%; over the 80 %% threshold\n" % (mount,usage)
                 print "\n%s" % (result)
                 error_list.append(result)
             else:
@@ -165,7 +179,7 @@ with open('./df-h', 'r') as file:
                     file.close()
             
             if usage > 80:
-                result = "%s usage is %d %%; over the 85 %% threshold\n" % (mount,usage)
+                result = "%s usage is %d %%; over the 80 %% threshold\n" % (mount,usage)
                 print "\n%s" % (result)
                 error_list.append(result)
             else:
@@ -178,21 +192,22 @@ with open('./df-h', 'r') as file:
 print "Checking root-history"
 flagged_words = ['install', 'yum', 'rpm', 'pip']
 flagged_lines = []
-with open('./history-root', 'r') as file:
-    contents = file.readlines()
-for line in contents:
-    if any(i.lower() in line.lower() for i in flagged_words):
-        flagged_lines.append(line)
+if os.path.exists('./history-root'):
+    with open('./history-root', 'r') as file:
+        contents = file.readlines()
+    for line in contents:
+        if any(i.lower() in line.lower() for i in flagged_words):
+            flagged_lines.append(line)
 
-if len(flagged_lines) > 0:
-    result = "Found modifications in root-history"
-    error_list.append(result)
-    error_list.append(flagged_lines)
-    print result
+    if len(flagged_lines) > 0:
+        result = "Found modifications in root-history"
+        error_list.append(result)
+        error_list.append(flagged_lines)
+        print result + "\n"
 
-if len(flagged_lines) == 0:
-    result = "PASS: No flagged lines in root-history"
-    print result
+    if len(flagged_lines) == 0:
+        result = "PASS: No flagged lines in root-history"
+        print result
 
 
 # ifconfig : Look for interface errors
@@ -211,18 +226,21 @@ with open('./ifconfig', 'r') as file:
             stat = map(str.strip, if_stat)
 
             if_name = stat[0].split()[0]
+
             if len(if_name) > 0:
                 ifstat_list.append(if_name)
             else:
                 pass
 
             if_addr = stat[1].split()[1]
+
             if len(if_addr) > 0:
                 ifstat_list.append(if_addr)
             else:
                 pass
 
             rXerrors = "rX" + stat[4].split()[2]
+
             if len(if_addr) > 0:
                 ifstat_list.append(rXerrors)
                 count = rXerrors.split(':')[1]
@@ -233,6 +251,7 @@ with open('./ifconfig', 'r') as file:
                     pass
 
             rXdropped = "rX" + stat[4].split()[3]
+
             if len(rXdropped) > 0:
                 ifstat_list.append(rXdropped)
                 count = rXdropped.split(':')[1]
@@ -243,6 +262,7 @@ with open('./ifconfig', 'r') as file:
                     pass
 
             rXoverruns = "rX" + stat[4].split()[4]
+
             if len(rXoverruns) > 0:
                 ifstat_list.append(rXoverruns)
                 count = rXoverruns.split(':')[1]
@@ -253,6 +273,7 @@ with open('./ifconfig', 'r') as file:
                     pass
             
             tXerrors = "tX" + stat[5].split()[2]
+
             if len(tXerrors) > 0:
                 ifstat_list.append(tXerrors)
                 count = tXerrors.split(':')[1]
@@ -263,6 +284,7 @@ with open('./ifconfig', 'r') as file:
                     pass
             
             tXdropped = "tX" + stat[5].split()[3]
+
             if len(tXdropped) > 0:
                 ifstat_list.append(tXdropped)
                 count = tXdropped.split(':')[1]
@@ -273,6 +295,7 @@ with open('./ifconfig', 'r') as file:
                     pass
 
             tXoverruns = "tX" + stat[5].split()[4]
+
             if len(tXoverruns) > 0:
                 ifstat_list.append(tXoverruns)
                 count = tXoverruns.split(':')[1]
@@ -283,6 +306,7 @@ with open('./ifconfig', 'r') as file:
                     pass
 
             tXcarrier = "tX" + stat[5].split()[5]
+
             if len(tXcarrier) > 0:
                 ifstat_list.append(tXcarrier)
                 count = tXcarrier.split(':')[1]
@@ -293,6 +317,7 @@ with open('./ifconfig', 'r') as file:
                     pass
             
             tXcollision = "tX" + stat[6].split()[0]
+
             if len(tXcollision) > 0:
                 ifstat_list.append(tXcollision)
                 count = tXcollision.split(':')[1]
@@ -400,15 +425,6 @@ for file in zpool_status_files:
                         pool_errors.append([pool_name, err_status])
                         error_list.append(pool_errors)
 
-                #print([file, line])
-
-            # err_status = line
-            # if err_status != "errors: No known data errors":
-            #     print "ERROR : %s : %s" % (file,err_status)
-            #     pool_errors.append(err_status)
-            # else:
-            #     print "\nPASS : %s : %s : Pool is clean" % (file,err_status)
-
 ## Parse the files /var/log
 os.chdir(new_path)
 os.chdir(sysLogs)
@@ -416,7 +432,7 @@ print "\nPocessing files in %s" % (sysLogs)
 
 # unzip the compressed files
 sys_zip_files = glob.glob("*.gz")
-print "Unzipping compressed files %s\n" % sys_zip_files
+print "Unzipping compressed files\n"
 
 for file in sys_zip_files:
     input = gzip.GzipFile(file, 'rb')
@@ -478,7 +494,7 @@ with open(file, 'r') as latest_messages:
 if len(message_errors) > 0:
     message_result = "Found %s matches in combined message logs" % len(message_errors)
     error_list.append(message_result)
-    print "\n%s\n" % message_result
+    print "%s\n" % message_result
 else:
     print "No errors found in messages\n"
 
@@ -519,7 +535,7 @@ with open(file, 'r') as latest_alerts:
 if len(monit_errors) > 0:
     monit_result = "Found %s matches in combined monit logs" % len(monit_errors)
     error_list.append(monit_result)
-    print "\n%s\n" % monit_result
+    print "%s\n" % monit_result
 else:
     print "No errors found in monit logs\n"
 
@@ -531,7 +547,7 @@ print "Processing files in %s\n" % os.getcwd()
 
 # unzip the compressed files
 app_zip_files = glob.glob("*.gz")
-print "Unzipping compressed files %s\n" % app_zip_files
+print "Unzipping compressed files\n"
 
 for file in app_zip_files:
     input = gzip.GzipFile(file, 'rb')
