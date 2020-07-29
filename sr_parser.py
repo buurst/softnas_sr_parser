@@ -18,23 +18,16 @@ if args.url is None:
 
 # Some functions
 def get_role():
-    if os.path.exists(rep_config) == True:
-        with open(rep_config, 'r') as f:
-            config = [line.rstrip('\n') for line in f.readlines()]
-            if len(config) > 1:
-                r = re.compile('^Role\s=\s"(.*)"')
-                role_string = filter(r.match, config)
-                role_name = role_string[0]
-                x = re.search(r'"(\S+)"', role_name)
-                role = (x.group(1))
-            else:
-                role_status = "Snaprepstatus File is CORRUPT!!"
-                error_list.append(role_status)
-                role = "unknown"
+  if os.path.exists(replication_config):
+    if "Role" in open(replication_config).read():
+      with open(replication_config, 'r') as f:
+        config_lines = f.readlines()
+        for line in config_lines:
+          if "Role" in line:
+            role = re.search('"(.*?)"', line)
+            role = role.group(0).replace('"','')
+            return role
 
-    if os.path.exists(rep_config) == False:
-        role = "source"
-    return role
 
 # Make a random word dictionary
 word_file = "/usr/share/dict/words"
@@ -53,7 +46,7 @@ else:
 
 # Download the support report
 url = args.url
-file_name = "%s/sr-%s.tgz" % (local_path, fname)
+file_name = '%s/sr-%s.tgz' % (local_path, fname)
 print "Downloading %s \n" % (file_name)
 urllib.urlretrieve (url, file_name)
 
@@ -64,10 +57,10 @@ sr.extractall(local_path)
 sr.close()
 
 # Decide if this is a source or target node
-rep_config = local_path + "/var/www/softnas/config/snaprepstatus.ini"
+replication_config = local_path + "/var/www/softnas/config/snaprepstatus.ini"
 
 role = get_role()
-print "This is a %s node \n" % (role)
+print "This server role is %s\n" % (role)
 new_path = home + "/support-reports/" + args.caseid + "/" + role
 if os.path.exists(new_path):
     c_time = os.path.getmtime(new_path)
@@ -334,7 +327,7 @@ with open('./ifconfig', 'r') as file:
 
             
             print ifstat_list
-            print '\n'
+            # print '\n'
 
         except:
             pass
