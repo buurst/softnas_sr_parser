@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, argparse, random, urllib, glob, tarfile, time, re, fnmatch, gzip
 
 # Create empty objects to contain warnings and errors
@@ -18,15 +18,19 @@ if args.url is None:
 
 # Some functions
 def get_role():
-  if os.path.exists(replication_config):
-    if "Role" in open(replication_config).read():
-      with open(replication_config, 'r') as f:
-        config_lines = f.readlines()
-        for line in config_lines:
-          if "Role" in line:
-            role = re.search('"(.*?)"', line)
-            role = role.group(0).replace('"','')
-            return role
+    if os.path.exists(replication_config):
+        if "Role" in open(replication_config).read():
+            with open(replication_config, 'r') as f:
+                config_lines = f.readlines()
+                for line in config_lines:
+                    if "Role" in line:
+                        role = re.search('"(.*?)"', line)
+                        role = role.group(0).replace('"','')
+        else:
+            role = "Unknown"
+    else:
+        role = "Single"
+    return role
 
 
 # Make a random word dictionary
@@ -116,7 +120,7 @@ os.chdir(statsDir)
 with open('./iostat') as file:
     contents = file.readlines()
     cpu_count = contents[0].split()[5:]
-    cpus = ' '.join(cpu_count) 
+    cpus = ' '.join(cpu_count)
     print "CPU count: %s" % cpus
 
 # free : Check out the memory stats
@@ -170,7 +174,7 @@ with open('./df-h', 'r') as file:
                     size = line.split()[1]
                     usage = float(line.split()[4].strip(' \t\n\r%'))
                     file.close()
-            
+
             if usage > 80:
                 result = "%s usage is %d %%; over the 80 %% threshold\n" % (mount,usage)
                 print "\n%s" % (result)
@@ -264,7 +268,7 @@ with open('./ifconfig', 'r') as file:
                     error_list.append([if_name, rXoverruns])
                 else:
                     pass
-            
+
             tXerrors = "tX" + stat[5].split()[2]
 
             if len(tXerrors) > 0:
@@ -275,7 +279,7 @@ with open('./ifconfig', 'r') as file:
                     error_list.append([if_name, tXerrors])
                 else:
                     pass
-            
+
             tXdropped = "tX" + stat[5].split()[3]
 
             if len(tXdropped) > 0:
@@ -308,7 +312,7 @@ with open('./ifconfig', 'r') as file:
                     error_list.append([if_name, tXcarrier])
                 else:
                     pass
-            
+
             tXcollision = "tX" + stat[6].split()[0]
 
             if len(tXcollision) > 0:
@@ -319,13 +323,13 @@ with open('./ifconfig', 'r') as file:
                     error_list.append([if_name, tXcollision])
                 else:
                     pass
-            
+
             if iferror_count > 0:
                 print "ERROR: Found %d interface errors on device %s" % (iferror_count, if_name)
             else:
                 print "PASS: Found %d interface errors on device %s" % (iferror_count, if_name)
 
-            
+
             print ifstat_list
             # print '\n'
 
@@ -347,7 +351,7 @@ for dev in disk_devices:
     print dev
 print '\n'
 
-    
+
 # netstat : look at the tcp connections
 with open('./netstat', 'r') as file:
     contents = file.read().splitlines()
@@ -523,7 +527,7 @@ with open(file, 'r') as latest_alerts:
         for error in monit_errors:
             err_log.write("%s\n" % error)
     err_log.close()
-    
+
 
 if len(monit_errors) > 0:
     monit_result = "Found %s matches in combined monit logs" % len(monit_errors)
@@ -566,7 +570,7 @@ if os.path.isfile('btier.log'):
         for line in contents:
             if any(i.lower() in line.lower() for i in btier_flags):
                 btier_errors.append(line)
-               
+
         if len(btier_errors) > 0:
             btier_status = "Found %s matches in btier logs" % len(btier_errors)
             error_list.append(btier_status)
@@ -712,7 +716,7 @@ if len(prog_logs) > 0:
                     err_log.write("%s\n" % error)
             err_log.close()
             print "%s\n" % prog_status
-            
+
     else:
             print "No errors found in replication progress logs\n"
 
@@ -735,7 +739,7 @@ if os.path.isfile('snapreplicate.log'):
                     if any(i.lower() in line.lower() for i in snaprep_alerts):
                         snaprep_errors.append([file, line])
             snaprep_log.close()
-        
+
 
 # Parse latest snapreplicate log and append
     file = 'snapreplicate.log'
@@ -777,7 +781,7 @@ if os.path.isfile('snserv.log'):
                     if any(i.lower() in line.lower() for i in snserv_alerts):
                         snserv_errors.append([file, line])
             snserv_log.close()
-        
+
 
 # Parse latest snserv log and append
     file = 'snserv.log'
