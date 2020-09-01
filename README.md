@@ -3,6 +3,10 @@
 
 This is the log parser for parsing SoftNAS support reports and finding general errors.
 
+sr_parser3.py is the python3 version.
+
+You can also run it as a container: https://hub.docker.com/r/rossethridge/sr-parser
+
 It requires two argumnents:
 
 ```--caseid : the associated support ticket or directory you want to download to```
